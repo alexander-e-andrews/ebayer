@@ -14,8 +14,14 @@ import (
 )
 
 func main() {
+	items = make([]item, 0)
 	activeRouter := httprouter.New()
 	staticRouter := httprouter.New()
+
+	activeRouter.GET("/", getList)
+	activeRouter.GET("/:id", getItem)
+	activeRouter.POST("/:id", updateItem)
+	activeRouter.GET("/newItem", newItem)
 
 	staticRouter.ServeFiles("/*filepath", neuteredFileSystem{http.Dir("./frontend")})
 	activeRouter.NotFound = staticRouter
@@ -31,6 +37,7 @@ func main() {
 		panic(err)
 	}
 }
+
 
 //From https://www.alexedwards.net/blog/disable-http-fileserver-directory-listings
 //There is a copy of this also at https://medium.com/@hau12a1/golang-http-serve-static-files-correctly-5feb98ae9da1

@@ -1,0 +1,13 @@
+<style>
+    img {
+        max-height: 500px;
+        height: 70%;
+        width: auto;
+    }
+</style>
+{{range $i, $obj := .}}
+<div onclick='window.location="/{{$i}}";'>
+
+    <img src="/images/{{.Image}}"></img><span>{{.Title}}</span>
+</div>
+{{end}}
