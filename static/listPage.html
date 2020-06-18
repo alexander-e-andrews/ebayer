@@ -1,13 +1,18 @@
 <style>
     img {
-        max-height: 500px;
+        max-height: 100px;
+        max-width: 100px;
         height: 70%;
         width: auto;
     }
+
+    div{
+        border: 1px solid blue;
+    }
 </style>
 {{range $i, $obj := .}}
-<div onclick='window.location="/{{$i}}";'>
-
-    <img src="/images/{{.Image}}"></img><span>{{.Title}}</span>
+<div onclick='window.location="/item/{{$i}}";'>
+    <h2>{{.Title}}</h2>
+    <img src="/images/{{if lt 0 (len .Images)}}{{index .Images 0}}{{end}}"></img>
 </div>
 {{end}}

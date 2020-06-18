@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"html/template"
+	"os"
 
 	"net/http"
 
@@ -10,20 +12,48 @@ import (
 
 	//"html/template"
 
+	"encoding/json"
+	"io/ioutil"
+
 	"github.com/julienschmidt/httprouter"
 )
 
+var itemPageTemplate *template.Template
+
 func main() {
-	items = make([]item, 0)
+	//For somereason itempageTemplate was becoming reinstatiated inside main, so not using the var we set up
+	var err error
+	itemPageTemplate, err = template.New("").ParseFiles("./static/itemPage.html", "./static/listPage.html")
+	if err != nil{
+		panic(err)
+	}
+	items = make([]*item, 0)
+	loadItemsFromBackup()
+	fmt.Println(items)
+	count = len(items)
+
+	//Create the images folder if it does not exist
+	_, err = os.Stat("./static/images")
+	if os.IsNotExist(err) {
+		errDir := os.MkdirAll("./static/images", 0755)
+		if errDir != nil {
+			panic(err)
+		}
+	}
+
+	//it := item{Title: "Temp"}
+	//items = append(items, it)
 	activeRouter := httprouter.New()
 	staticRouter := httprouter.New()
 
 	activeRouter.GET("/", getList)
-	activeRouter.GET("/:id", getItem)
-	activeRouter.POST("/:id", updateItem)
 	activeRouter.GET("/newItem", newItem)
+	activeRouter.POST("/upload", uploadFile)
+	activeRouter.GET("/item/:id", getItem)
+	activeRouter.POST("/item/:id", updateItem)
+	
 
-	staticRouter.ServeFiles("/*filepath", neuteredFileSystem{http.Dir("./frontend")})
+	staticRouter.ServeFiles("/*filepath", neuteredFileSystem{http.Dir("./static")})
 	activeRouter.NotFound = staticRouter
 
 	server := &http.Server{
@@ -32,12 +62,36 @@ func main() {
 	}
 
 	//In production, to be switched with the tlc service
-	err := server.ListenAndServe()
+	err = server.ListenAndServe()
 	if err != nil {
 		panic(err)
 	}
 }
 
+func saveItemsToBackup(){
+	file, _ := json.Marshal(items)
+	_ = ioutil.WriteFile("backup.json", file, 0644)
+}
+
+func loadItemsFromBackup(){
+	b, err := ioutil.ReadFile("backup.json")
+
+	//Change, but we should check if teh file exists, if not, then we create it
+	if err != nil{
+		fmt.Println(err)
+		ioutil.WriteFile("backup.json", []byte{}, 0644)
+		return
+	}
+
+	err = json.Unmarshal(b, &items)
+	fmt.Println(err)
+}
+
+func pError(err error){
+	if err != nil{
+		panic(err)
+	}
+}
 
 //From https://www.alexedwards.net/blog/disable-http-fileserver-directory-listings
 //There is a copy of this also at https://medium.com/@hau12a1/golang-http-serve-static-files-correctly-5feb98ae9da1

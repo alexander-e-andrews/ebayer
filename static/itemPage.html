@@ -1,0 +1,75 @@
+<script src="/itemPage.js"></script>
+<style>
+    img {
+        max-width: 300;
+        max-height: 300;
+    }
+
+    .container {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+
+    #imageForm #images {
+        height: 150px;
+        width: 78%;
+        background-color: lightslategray;
+    }
+
+    #imageForm #upload {
+        height: 150px;
+        width: 18%;
+        background-color: lightslategray;
+    }
+
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    /* Firefox */
+    input[type=number] {
+        -moz-appearance: textfield;
+    }
+</style>
+
+<input id="itemID" type="hidden" value="{{.ID}}">
+<button onclick="nextPage({{.ID}})">Next Page</button>
+<div class="container">
+    {{range .Images}}
+    <img src="/images/{{.}}">
+    {{end}}
+</div>
+
+<form id="form" action="javascript:updateItem();" autocomplete="off">
+    <label for="title">Title:</label>
+    <input type="text" id="title" name="Title" value="{{.Title}}" size="100"><br>
+    <label for="description">Description:</label><br>
+    <textarea rows="8" cols="100" name="Description" id="description">{{.Description}}</textarea><br>
+
+    <label for="sizeDescription">Size Description:</label><br>
+    <input type="text" id="sizeDescription" name="SizeDescription" value="{{.SizeDescription}}" size="100"><br>
+
+    <label for="ShipL">Shipping L W H:</label>
+    <input type="number" id="ShipL" name="ShipL" value="{{.ShipL}}" step="any"><input type="number" id="ShipW"
+        name="ShipW" value="{{.ShipW}}" step="any"><input type="number" id="ShipH" name="ShipH" value="{{.ShipH}}"
+        step="any"><br>
+
+    <label for="ShipWeight">Shipping lb.oz:</label>
+    <input type="number" id="ShipWeight" name="ShipWeight" value="{{.ShipWeight}}"><br>
+
+    <label for="Price">Price:</label>
+    <input type="number" id="Price" name="Price" value="{{.Price}}" step="any"><br>
+
+    <label for="Listed">Listed:</label>
+    <input type="checkbox" id="Listed" name="Listed" value="{{.Listed}}"><br>
+
+    <input type="submit" value="Submit">
+</form>
+
+<form id="imageForm" action="javascript:uploadImages();">
+    <input type="file" id="images" name="images" multiple />
+    <input type="submit" id="upload" value="upload" />
+</form>
